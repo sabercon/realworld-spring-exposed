@@ -1,0 +1,17 @@
+name: Detekt
+
+on: push
+
+jobs:
+  detekt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: natiginfo/action-detekt-all@1.22.0
+        with:
+          # Adds `--plugins` because of this issue:
+          # https://github.com/natiginfo/action-detekt-all/issues/44#issuecomment-1137125204
+          args: --build-upon-default-config --config config/detekt/config.yml --baseline config/detekt/baseline.xml
+            --plugins config/detekt/detekt-formatting-1.22.0.jar

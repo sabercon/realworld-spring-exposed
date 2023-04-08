@@ -5,6 +5,8 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.8.20"
     kotlin("plugin.spring") version "1.8.20"
+
+    id("io.gitlab.arturbosch.detekt") version "1.22.0"
 }
 
 group = "cn.sabercon"
@@ -41,4 +43,11 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+detekt {
+    autoCorrect = true
+    buildUponDefaultConfig = true
+    config = files("$rootDir/config/detekt/config.yml")
+    baseline = file("$rootDir/config/detekt/baseline.xml")
 }
