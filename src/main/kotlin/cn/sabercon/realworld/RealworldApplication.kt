@@ -6,6 +6,6 @@ import org.springframework.boot.runApplication
 @SpringBootApplication
 class RealworldApplication
 
-fun main(args: Array<String>) {
+fun main(vararg args: String) {
     runApplication<RealworldApplication>(*args)
 }
