@@ -1,1 +1,15 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/realworld
+    username: postgres
+    password: postgres
 
+realworld:
+  jwt.key: some-key
+
+logging.level:
+  web: debug
+  sql: debug
+  cn.sabercon.realworld: debug
