@@ -7,6 +7,7 @@ plugins {
     kotlin("plugin.spring") version "1.8.20"
 
     id("io.gitlab.arturbosch.detekt") version "1.22.0"
+    id("org.jetbrains.kotlinx.kover") version "0.6.1"
 }
 
 group = "cn.sabercon"
