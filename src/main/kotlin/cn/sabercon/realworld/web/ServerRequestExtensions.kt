@@ -27,6 +27,8 @@ fun ServerRequest.token(): String? {
 
 /**
  * Verifies the Authorization header and returns the user id.
+ *
+ * @throws ResponseStatusException if the token not found or invalid.
  */
 fun ServerRequest.userId(): String {
     val token = token() ?: unauthorized("Token not found")

@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.core.Ordered
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.stereotype.Component
 import org.springframework.web.HttpMediaTypeNotAcceptableException
@@ -15,7 +14,7 @@ import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver
 
 @Component
-class GlobalExceptionResolver(private val mapper: ObjectMapper) : AbstractHandlerExceptionResolver() {
+class GlobalHandlerExceptionResolver(private val mapper: ObjectMapper) : AbstractHandlerExceptionResolver() {
 
     init {
         order = Ordered.HIGHEST_PRECEDENCE
@@ -28,8 +27,12 @@ class GlobalExceptionResolver(private val mapper: ObjectMapper) : AbstractHandle
         ex: Exception,
     ): ModelAndView? {
         val (status, error) = statusAndError(ex)
-        response.contentType = MediaType.APPLICATION_JSON_VALUE
-        response.characterEncoding = Charsets.UTF_8.name()
+        if (status == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+            logUnknownException(request, ex)
+        }
+
+        response.contentType = "application/json"
+        response.characterEncoding = "UTF-8"
         response.status = status
         response.writer.write(mapper.writeValueAsString(error))
         return ModelAndView()
@@ -43,6 +46,10 @@ class GlobalExceptionResolver(private val mapper: ObjectMapper) : AbstractHandle
             is ResponseStatusException -> ex.statusCode.value() to ErrorResponse.of(ex.reason)
             else -> HttpStatus.INTERNAL_SERVER_ERROR.value() to ErrorResponse.of("UNKNOWN_ERROR")
         }
+    }
+
+    private fun logUnknownException(request: HttpServletRequest, ex: Exception) {
+        logger.error("Unknown error on ${request.method} ${request.requestURI}", ex)
     }
 
     private data class ErrorResponse(val body: Body) {
