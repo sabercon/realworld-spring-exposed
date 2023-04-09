@@ -24,10 +24,9 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.flywaydb:flyway-core")
-    // https://mvnrepository.com/artifact/com.auth0/java-jwt
     implementation("com.auth0:java-jwt:4.4.0")
-    // https://mvnrepository.com/artifact/com.github.slugify/slugify
     implementation("com.github.slugify:slugify:3.0.2")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

@@ -6,6 +6,15 @@ spring:
     username: postgres
     password: postgres
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
 realworld:
   jwt.key: some-key
 
