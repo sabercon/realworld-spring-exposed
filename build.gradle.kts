@@ -22,15 +22,15 @@ dependencies {
     implementation(platform("org.testcontainers:testcontainers-bom:1.17.6"))
     implementation(platform("io.kotest:kotest-bom:5.5.5"))
 
-    implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.flywaydb:flyway-core")
-    implementation("com.auth0:java-jwt:4.4.0")
-    implementation("com.github.slugify:slugify:3.0.2")
-
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:0.41.1")
+    implementation("com.auth0:java-jwt:4.4.0")
+    implementation("com.github.slugify:slugify:3.0.2")
 
     runtimeOnly("org.postgresql:postgresql")
 
