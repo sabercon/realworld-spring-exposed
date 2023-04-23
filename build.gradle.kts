@@ -29,6 +29,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     implementation("org.jetbrains.exposed:exposed-spring-boot-starter:0.41.1")
+    implementation("org.jetbrains.exposed:exposed-java-time:0.41.1")
     implementation("com.auth0:java-jwt:4.4.0")
     implementation("com.github.slugify:slugify:3.0.2")
 
