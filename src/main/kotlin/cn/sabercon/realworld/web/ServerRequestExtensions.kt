@@ -45,8 +45,8 @@ fun ServerRequest.userIdOrNull(): String? {
     return runCatching { userId() }.getOrNull()
 }
 
-fun ServerRequest.pageRequest(): PageRequest {
+fun ServerRequest.pageParams(): PageParams {
     val offset = paramOrNull("offset")?.toLongOrNull() ?: 0
     val limit = paramOrNull("limit")?.toIntOrNull() ?: 20
-    return PageRequest(offset, limit)
+    return PageParams(offset, limit)
 }
