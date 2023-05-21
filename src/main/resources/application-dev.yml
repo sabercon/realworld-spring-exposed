@@ -1,10 +1,9 @@
 server:
   port: 8080
+
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/realworld
-    username: postgres
-    password: postgres
+  mvc:
+    log-request-details: true
 
 management:
   endpoints:
