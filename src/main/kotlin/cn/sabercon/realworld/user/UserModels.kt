@@ -28,7 +28,17 @@ data class UserModel(
     val username: String,
     val bio: String? = null,
     val image: String? = null,
-)
+) {
+    companion object {
+        fun fromUser(user: User, token: String) = UserModel(
+            email = user.email,
+            token = token,
+            username = user.username,
+            bio = user.bio,
+            image = user.image,
+        )
+    }
+}
 
 data class ProfileModel(
     val username: String,

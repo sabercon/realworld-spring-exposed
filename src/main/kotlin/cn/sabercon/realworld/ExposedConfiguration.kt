@@ -1,4 +1,4 @@
-package cn.sabercon.realworld.jdbc
+package cn.sabercon.realworld
 
 import org.jetbrains.exposed.spring.autoconfigure.ExposedAutoConfiguration
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
