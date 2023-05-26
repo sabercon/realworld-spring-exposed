@@ -45,7 +45,16 @@ data class ProfileModel(
     val bio: String? = null,
     val image: String? = null,
     val following: Boolean,
-)
+) {
+    companion object {
+        fun fromUser(user: User, following: Boolean) = ProfileModel(
+            username = user.username,
+            bio = user.bio,
+            image = user.image,
+            following = following,
+        )
+    }
+}
 
 data class UserResponse(val user: UserModel)
 
