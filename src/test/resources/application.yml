@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    active: test
+
+realworld:
+  jwt.key: test-key
