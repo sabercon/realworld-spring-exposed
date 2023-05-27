@@ -10,14 +10,14 @@ import cn.sabercon.realworld.util.BaseLongIdTable
 import cn.sabercon.realworld.util.string
 import org.jetbrains.exposed.dao.id.EntityID
 
-object Comments: BaseLongIdTable("comment") {
+object Comments : BaseLongIdTable("comment") {
     val body = string("body")
     val authorId = reference("author_id", Users)
     val articleId = reference("article_id", Articles)
 }
 
-class Comment(id: EntityID<Long>): BaseLongEntity(id, Comments) {
-    companion object: BaseLongEntityClass<Comment>(Comments)
+class Comment(id: EntityID<Long>) : BaseLongEntity(id, Comments) {
+    companion object : BaseLongEntityClass<Comment>(Comments)
 
     var body by Comments.body
     var author by User referencedOn Comments.authorId

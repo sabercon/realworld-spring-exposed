@@ -1,6 +1,6 @@
 package cn.sabercon.realworld.comment
 
-import cn.sabercon.realworld.article.*
+import cn.sabercon.realworld.article.ArticleService
 import cn.sabercon.realworld.user.UserService
 import cn.sabercon.realworld.util.forbidden
 import cn.sabercon.realworld.util.tx
