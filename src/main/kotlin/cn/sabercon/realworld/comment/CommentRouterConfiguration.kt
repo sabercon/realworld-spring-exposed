@@ -29,7 +29,7 @@ class CommentRouterConfiguration {
 
         DELETE("/articles/{slug}/comments/{id}") {
             val userId = it.userId()
-            val id = it.pathVariable("id")
+            val id = it.pathVariable("id").toLong()
             service.deleteComment(userId, id)
             ok().build()
         }

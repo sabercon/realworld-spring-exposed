@@ -8,12 +8,24 @@ data class CommentCreateRequest(val comment: Comment) {
 }
 
 data class CommentModel(
-    val id: String,
+    val id: Long,
     val createdAt: Instant,
     val updatedAt: Instant,
     val body: String,
     val author: ProfileModel,
-)
+) {
+    companion object {
+        fun from(comment: Comment, author: ProfileModel): CommentModel {
+            return CommentModel(
+                id = comment.id.value,
+                createdAt = comment.createdAt,
+                updatedAt = comment.updatedAt,
+                body = comment.body,
+                author = author,
+            )
+        }
+    }
+}
 
 data class CommentResponse(val comment: CommentModel)
 
