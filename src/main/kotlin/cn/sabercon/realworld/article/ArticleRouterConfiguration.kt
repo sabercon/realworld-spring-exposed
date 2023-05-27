@@ -13,6 +13,7 @@ import org.springframework.web.servlet.function.router
 class ArticleRouterConfiguration {
 
     @Bean
+    @Suppress("LongMethod")
     fun articleRouter(service: ArticleService) = router {
         GET("/articles") {
             val userId = it.userIdOrNull()

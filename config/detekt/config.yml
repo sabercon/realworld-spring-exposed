@@ -721,3 +721,6 @@ style:
     active: true
     excludeImports:
       - 'java.util.*'
+      - 'org.jetbrains.exposed.sql.*'
+      - 'org.jetbrains.exposed.dao.*'
+      - 'cn.sabercon.realworld.util.*'

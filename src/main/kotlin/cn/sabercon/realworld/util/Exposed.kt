@@ -29,7 +29,7 @@ fun ExposedSQLException.isUniqueConstraintException(key: String? = null): Boolea
     return sqlState == "23505" && (key == null || key in message!!)
 }
 
-abstract class BaseTable(name: String = "") : Table(name) {
+open class BaseTable(name: String = "") : Table(name) {
     val createdAt = timestamp("created_at").defaultExpression(CurrentTimestamp())
     val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp())
 }
@@ -39,12 +39,12 @@ abstract class BaseIdTable<T : Comparable<T>>(name: String = "") : IdTable<T>(na
     val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp())
 }
 
-abstract class BaseEntity<ID : Comparable<ID>>(id: EntityID<ID>, table: BaseIdTable<ID>) : Entity<ID>(id) {
+open class BaseEntity<ID : Comparable<ID>>(id: EntityID<ID>, table: BaseIdTable<ID>) : Entity<ID>(id) {
     val createdAt by table.createdAt
     var updatedAt by table.updatedAt
 }
 
-abstract class BaseEntityClass<ID : Comparable<ID>, out T : BaseEntity<ID>>(table: BaseIdTable<ID>) :
+open class BaseEntityClass<ID : Comparable<ID>, out T : BaseEntity<ID>>(table: BaseIdTable<ID>) :
     EntityClass<ID, T>(table) {
     init {
         // To Autofill updated columns on entity change.
@@ -60,11 +60,11 @@ abstract class BaseEntityClass<ID : Comparable<ID>, out T : BaseEntity<ID>>(tabl
     }
 }
 
-abstract class BaseLongIdTable(name: String = "", columnName: String = "id") : BaseIdTable<Long>(name) {
+open class BaseLongIdTable(name: String = "", columnName: String = "id") : BaseIdTable<Long>(name) {
     final override val id: Column<EntityID<Long>> = long(columnName).autoIncrement().entityId()
     final override val primaryKey = PrimaryKey(id)
 }
 
-abstract class BaseLongEntity(id: EntityID<Long>, table: BaseLongIdTable) : BaseEntity<Long>(id, table)
+open class BaseLongEntity(id: EntityID<Long>, table: BaseLongIdTable) : BaseEntity<Long>(id, table)
 
-abstract class BaseLongEntityClass<out T : BaseLongEntity>(table: BaseLongIdTable) : BaseEntityClass<Long, T>(table)
+open class BaseLongEntityClass<out T : BaseLongEntity>(table: BaseLongIdTable) : BaseEntityClass<Long, T>(table)
