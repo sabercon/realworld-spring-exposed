@@ -2,6 +2,9 @@ name: Kover
 
 on: pull_request
 
+permissions:
+  pull-requests: write
+
 jobs:
   kover:
     runs-on: ubuntu-latest
