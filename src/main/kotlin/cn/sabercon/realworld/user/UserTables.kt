@@ -21,7 +21,6 @@ object UserFollows : BaseTable("user_follow") {
 }
 
 class User(id: EntityID<String>) : BaseEntity<String>(id, Users) {
-
     companion object : BaseEntityClass<String, User>(Users)
 
     var email by Users.email

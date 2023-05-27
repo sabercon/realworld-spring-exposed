@@ -38,23 +38,23 @@ class UserRouterConfiguration {
         }
 
         GET("/profiles/{username}") {
-            val followerId = it.userIdOrNull()
+            val userId = it.userIdOrNull()
             val username = it.pathVariable("username")
-            val model = service.getProfile(followerId, username)
+            val model = service.getProfile(userId, username)
             ok().body(ProfileResponse(model))
         }
 
         POST("/profiles/{username}/follow") {
-            val followerId = it.userId()
+            val userId = it.userId()
             val username = it.pathVariable("username")
-            val model = service.followUser(followerId, username)
+            val model = service.followUser(userId, username)
             ok().body(ProfileResponse(model))
         }
 
         DELETE("/profiles/{username}/follow") {
-            val followerId = it.userId()
+            val userId = it.userId()
             val username = it.pathVariable("username")
-            val model = service.unfollowUser(followerId, username)
+            val model = service.unfollowUser(userId, username)
             ok().body(ProfileResponse(model))
         }
     }

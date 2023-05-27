@@ -30,7 +30,6 @@ object ArticleFavorites : BaseTable("article_favorite") {
 }
 
 class Article(id: EntityID<Long>) : BaseLongEntity(id, Articles) {
-
     companion object : BaseLongEntityClass<Article>(Articles)
 
     var slug by Articles.slug

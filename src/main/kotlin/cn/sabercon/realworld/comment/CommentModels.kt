@@ -15,13 +15,13 @@ data class CommentModel(
     val author: ProfileModel,
 ) {
     companion object {
-        fun from(comment: Comment, author: ProfileModel): CommentModel {
+        fun from(comment: Comment, authorFollowed: Boolean): CommentModel {
             return CommentModel(
                 id = comment.id.value,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
                 body = comment.body,
-                author = author,
+                author = ProfileModel.fromUser(comment.author, authorFollowed),
             )
         }
     }

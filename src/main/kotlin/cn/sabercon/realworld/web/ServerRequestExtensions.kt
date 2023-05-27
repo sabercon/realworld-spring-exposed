@@ -50,3 +50,5 @@ fun ServerRequest.pageParams(): PageParams {
     val limit = paramOrNull("limit")?.toIntOrNull() ?: 20
     return PageParams(offset, limit)
 }
+
+data class PageParams(val offset: Long, val limit: Int)

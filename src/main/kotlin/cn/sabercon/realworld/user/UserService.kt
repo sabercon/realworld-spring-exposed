@@ -3,8 +3,10 @@ package cn.sabercon.realworld.user
 import cn.sabercon.realworld.util.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.exceptions.ExposedSQLException
-import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insertIgnore
 import org.springframework.stereotype.Service
 
 @Service
@@ -57,43 +59,38 @@ class UserService(private val jwt: Jwt) {
     }
 
     fun getProfile(followerId: String?, username: String): ProfileModel = tx {
-        toProfile(followerId, getByUsername(username))
+        val user = getByUsername(username)
+        ProfileModel.fromUser(user, isFollowed(followerId, user))
     }
 
-    fun followUser(followerId: String, username: String): ProfileModel = tx {
-        val followee = getByUsername(username)
+    fun followUser(userId: String, followeeUsername: String): ProfileModel = tx {
+        val followee = getByUsername(followeeUsername)
         UserFollows.insertIgnore {
-            it[this.followerId] = EntityID(followerId, Users)
+            it[followerId] = EntityID(userId, Users)
             it[followeeId] = followee.id
         }
         ProfileModel.fromUser(followee, true)
     }
 
-    fun unfollowUser(followerId: String, username: String): ProfileModel = tx {
-        val followee = getByUsername(username)
+    fun unfollowUser(userId: String, followeeUsername: String): ProfileModel = tx {
+        val followee = getByUsername(followeeUsername)
         UserFollows.deleteWhere {
-            this.followerId eq EntityID(followerId, Users) and (followeeId eq followee.id)
+            followerId eq EntityID(userId, Users) and (followeeId eq followee.id)
         }
         ProfileModel.fromUser(followee, false)
-    }
-
-    fun toProfile(followerId: String?, user: User): ProfileModel {
-        val following = followerId != null && isFollowed(followerId, user)
-        return ProfileModel.fromUser(user, following)
     }
 
     fun getById(id: String): User {
         return User[id]
     }
 
-    private fun getByUsername(username: String): User {
-        return User.find { Users.username eq username }.firstOrNull() ?: notFound("User not found")
+    fun getByUsername(username: String): User {
+        return User.find { Users.username eq username }.single()
     }
 
-    private fun isFollowed(followerId: String, user: User): Boolean {
-        return UserFollows.slice(Op.TRUE).select {
-            UserFollows.followerId eq EntityID(followerId, Users) and (UserFollows.followeeId eq user.id)
-        }.empty().not()
+    fun isFollowed(followerId: String?, user: User): Boolean {
+        return followerId != null && UserFollows
+            .exists { UserFollows.followerId eq EntityID(followerId, Users) and (followeeId eq user.id) }
     }
 
     private fun toModel(user: User): UserModel = UserModel.fromUser(user, jwt.generateToken(user.id.value))

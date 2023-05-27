@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class CommentService(private val userService: UserService, private val articleService: ArticleService) {
+
     fun createComment(userId: String, articleSlug: String, payload: CommentCreateRequest.Comment): CommentModel = tx {
         val comment = Comment.new {
             body = payload.body
@@ -22,8 +23,8 @@ class CommentService(private val userService: UserService, private val articleSe
     }
 
     fun listComment(userId: String?, articleSlug: String): List<CommentModel> = tx {
-        val articleId = articleService.getIdBySlug(articleSlug)
-        Comment.find { Comments.articleId eq articleId }
+        val article = articleService.getBySlug(articleSlug)
+        Comment.find { Comments.articleId eq article.id }
             .with(Comment::author)
             .sortedBy { it.createdAt }
             .map { toModel(userId, it) }
@@ -39,6 +40,6 @@ class CommentService(private val userService: UserService, private val articleSe
     }
 
     private fun toModel(userId: String?, comment: Comment): CommentModel {
-        return CommentModel.from(comment, userService.toProfile(userId, comment.author))
+        return CommentModel.from(comment, userService.isFollowed(userId, comment.author))
     }
 }

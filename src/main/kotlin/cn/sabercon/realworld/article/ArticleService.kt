@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ArticleService(private val userService: UserService) {
+
     fun listArticle(
         userId: String?,
         tag: String?,
@@ -21,8 +22,7 @@ class ArticleService(private val userService: UserService) {
         favorited: String?,
         pageParams: PageParams,
     ): List<ArticleModel> = tx {
-        val query = buildArticleQuery(tag, author, favorited)
-        queryArticlePage(userId, query, pageParams)
+        queryArticlePage(buildArticleQuery(tag, author, favorited), userId, pageParams)
     }
 
     fun countArticle(tag: String?, author: String?, favorited: String?): Long = tx {
@@ -30,8 +30,7 @@ class ArticleService(private val userService: UserService) {
     }
 
     fun listFeedArticle(userId: String, pageParams: PageParams): List<ArticleModel> = tx {
-        val query = buildFeedArticleQuery(userId)
-        queryArticlePage(userId, query, pageParams)
+        queryArticlePage(buildFeedArticleQuery(userId), userId, pageParams)
     }
 
     fun countFeedArticle(userId: String): Long = tx {
@@ -46,8 +45,9 @@ class ArticleService(private val userService: UserService) {
         }
         if (author != null) {
             val authors = Users.alias("authors")
-            columnSet = columnSet.innerJoin(authors, { Articles.authorId }, { authors[Users.id] })
-            { authors[Users.username] eq author }
+            val authorId = authors[Users.id]
+            val authorUsername = authors[Users.username]
+            columnSet = columnSet.innerJoin(authors, { Articles.authorId }, { authorId }) { authorUsername eq author }
         }
         if (favorited != null) {
             columnSet = columnSet.innerJoin(ArticleFavorites, { Articles.id }, { articleId })
@@ -62,7 +62,7 @@ class ArticleService(private val userService: UserService) {
             .select { UserFollows.followerId eq EntityID(userId, Users) }
     }
 
-    private fun queryArticlePage(userId: String?, query: Query, pageParams: PageParams): List<ArticleModel> {
+    private fun queryArticlePage(query: Query, userId: String?, pageParams: PageParams): List<ArticleModel> {
         return query.orderBy(Articles.createdAt to SortOrder.DESC)
             .limit(pageParams.limit, pageParams.offset)
             .let { Article.wrapRows(it).toList() }
@@ -78,7 +78,7 @@ class ArticleService(private val userService: UserService) {
         tx {
             val article = Article.new {
                 title = payload.title
-                slug = SLUGIFY.slugify(payload.title)
+                slug = payload.title.slugify()
                 description = payload.description
                 body = payload.body
                 author = userService.getById(userId)
@@ -100,7 +100,7 @@ class ArticleService(private val userService: UserService) {
 
             payload.title?.let {
                 article.title = it
-                article.slug = SLUGIFY.slugify(it)
+                article.slug = it.slugify()
             }
             payload.description?.let { article.description = it }
             payload.body?.let { article.body = it }
@@ -115,8 +115,8 @@ class ArticleService(private val userService: UserService) {
 
     fun deleteArticle(userId: String, slug: String): Unit = tx {
         val (articleId, authorId) = Articles.slice(Articles.id, Articles.authorId)
-            .select { Articles.slug eq slug }.single()
-            .let { it[Articles.id] to it[Articles.authorId] }
+            .select { Articles.slug eq slug }
+            .single().let { it[Articles.id] to it[Articles.authorId] }
         if (authorId.value != userId) forbidden("Not author")
 
         Articles.deleteWhere { id eq articleId }
@@ -130,7 +130,7 @@ class ArticleService(private val userService: UserService) {
             it[this.userId] = EntityID(userId, Users)
             it[articleId] = article.id
         }
-        toModel(userId, article)
+        toModel(userId, article, true)
     }
 
     fun unfavoriteArticle(userId: String, slug: String): ArticleModel = tx {
@@ -138,17 +138,24 @@ class ArticleService(private val userService: UserService) {
         ArticleFavorites.deleteWhere {
             this.userId eq EntityID(userId, Users) and (articleId eq article.id)
         }
-        toModel(userId, article)
+        toModel(userId, article, false)
     }
 
     fun listTag(): List<String> = tx {
         Tag.all().map { it.name }
     }
 
-    fun getIdBySlug(slug: String): EntityID<Long> {
-        return Articles.slice(Articles.id)
-            .select { Articles.slug eq slug }
-            .single()[Articles.id]
+    fun getBySlug(slug: String): Article {
+        return Article.find { Articles.slug eq slug }.single()
+    }
+
+    private fun isFavorited(userId: String?, article: Article): Boolean {
+        return userId != null && ArticleFavorites
+            .exists { ArticleFavorites.userId eq EntityID(userId, Users) and (articleId eq article.id) }
+    }
+
+    private fun countFavorite(article: Article): Long {
+        return ArticleFavorites.select { ArticleFavorites.articleId eq article.id }.count()
     }
 
     private fun upsertTags(tags: List<String>): List<Tag> {
@@ -156,26 +163,16 @@ class ArticleService(private val userService: UserService) {
         return Tag.find { Tags.name inList tags }.toList()
     }
 
-    fun getBySlug(slug: String): Article {
-        return Article.find { Articles.slug eq slug }.single()
-    }
-
-    private fun isFavorited(userId: String, article: Article): Boolean {
-        return ArticleFavorites.slice(Op.TRUE).select {
-            ArticleFavorites.userId eq EntityID(userId, Users) and (ArticleFavorites.articleId eq article.id)
-        }.empty().not()
-    }
-
-    private fun countFavorite(article: Article): Long {
-        return ArticleFavorites.select { ArticleFavorites.articleId eq article.id }.count()
-    }
-
-    private fun toModel(userId: String?, article: Article): ArticleModel {
+    private fun toModel(
+        userId: String?,
+        article: Article,
+        favorited: Boolean = isFavorited(userId, article),
+    ): ArticleModel {
         return ArticleModel.from(
             article,
-            userService.toProfile(userId, article.author),
-            userId != null && isFavorited(userId, article),
+            favorited,
             countFavorite(article),
+            userService.isFollowed(userId, article.author),
         )
     }
 }

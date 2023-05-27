@@ -21,6 +21,10 @@ fun Table.string(name: String, collate: String? = null): Column<String> {
     return varchar(name, Int.MAX_VALUE, collate)
 }
 
+fun <T : Table> T.exists(op: T.(ISqlExpressionBuilder) -> Op<Boolean>): Boolean {
+    return slice(Op.TRUE).select { op(this) }.empty().not()
+}
+
 fun ExposedSQLException.isUniqueConstraintException(key: String? = null): Boolean {
     return sqlState == "23505" && (key == null || key in message!!)
 }
@@ -43,6 +47,11 @@ abstract class BaseEntity<ID : Comparable<ID>>(id: EntityID<ID>, table: BaseIdTa
 abstract class BaseEntityClass<ID : Comparable<ID>, out T : BaseEntity<ID>>(table: BaseIdTable<ID>) :
     EntityClass<ID, T>(table) {
     init {
+        // To Autofill updated columns on entity change.
+        // See [here](https://github.com/paulkagiri/ExposedDatesAutoFill/blob/master/src/main/kotlin/app/Models.kt).
+        // This approach is not perfect because the update is separated from other update statements.
+        // In the many-to-many relationship, it may update the timestamp even if the entity is not changed.
+        // Also, it will not work if the entity is updated by raw SQL.
         EntityHook.subscribe { action ->
             if (action.changeType == EntityChangeType.Updated) {
                 action.toEntity(this)?.updatedAt = Instant.now()

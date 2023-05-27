@@ -33,7 +33,7 @@ data class ArticleModel(
     val author: ProfileModel,
 ) {
     companion object {
-        fun from(article: Article, author: ProfileModel, favorited: Boolean, favoritesCount: Long): ArticleModel {
+        fun from(article: Article, favorited: Boolean, favoritesCount: Long, authorFollowed: Boolean): ArticleModel {
             return ArticleModel(
                 slug = article.slug,
                 title = article.title,
@@ -44,7 +44,7 @@ data class ArticleModel(
                 updatedAt = article.updatedAt,
                 favorited = favorited,
                 favoritesCount = favoritesCount,
-                author = author,
+                author = ProfileModel.fromUser(article.author, authorFollowed),
             )
         }
     }

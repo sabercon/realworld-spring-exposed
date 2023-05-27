@@ -47,11 +47,11 @@ data class ProfileModel(
     val following: Boolean,
 ) {
     companion object {
-        fun fromUser(user: User, following: Boolean) = ProfileModel(
+        fun fromUser(user: User, followed: Boolean) = ProfileModel(
             username = user.username,
             bio = user.bio,
             image = user.image,
-            following = following,
+            following = followed,
         )
     }
 }
