@@ -3,6 +3,7 @@ package cn.sabercon.realworld.web
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.jetbrains.exposed.dao.exceptions.EntityNotFoundException
 import org.springframework.core.Ordered
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
@@ -43,6 +44,8 @@ class GlobalHandlerExceptionResolver(private val mapper: ObjectMapper) : Abstrac
             is HttpMediaTypeNotSupportedException -> HttpStatus.UNSUPPORTED_MEDIA_TYPE.value() to ErrorResponse.of(ex)
             is HttpMediaTypeNotAcceptableException -> HttpStatus.NOT_ACCEPTABLE.value() to ErrorResponse.of(ex)
             is HttpMessageNotReadableException -> HttpStatus.UNSUPPORTED_MEDIA_TYPE.value() to ErrorResponse.of(ex)
+            is NoSuchElementException -> HttpStatus.NOT_FOUND.value() to ErrorResponse.of(ex)
+            is EntityNotFoundException -> HttpStatus.NOT_FOUND.value() to ErrorResponse.of(ex)
             is ResponseStatusException -> ex.statusCode.value() to ErrorResponse.of(ex.reason)
             else -> HttpStatus.INTERNAL_SERVER_ERROR.value() to ErrorResponse.of("UNKNOWN_ERROR")
         }
