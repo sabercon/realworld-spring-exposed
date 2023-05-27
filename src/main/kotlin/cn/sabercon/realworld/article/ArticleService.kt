@@ -74,11 +74,19 @@ class ArticleService(private val userService: UserService) {
         toModel(userId, getBySlug(slug))
     }
 
-    fun createArticle(userId: String, payload: ArticleCreateRequest.Article): ArticleModel = try {
+    fun createArticle(userId: String, payload: ArticleCreateRequest.Article): ArticleModel {
+        return doCreateArticle(userId, payload, false)
+    }
+
+    private fun doCreateArticle(
+        userId: String,
+        payload: ArticleCreateRequest.Article,
+        slugSuffix: Boolean,
+    ): ArticleModel = try {
         tx {
             val article = Article.new {
                 title = payload.title
-                slug = payload.title.slugify()
+                slug = payload.title.slugify(slugSuffix)
                 description = payload.description
                 body = payload.body
                 author = userService.getById(userId)
@@ -88,19 +96,28 @@ class ArticleService(private val userService: UserService) {
         }
     } catch (e: ExposedSQLException) {
         when {
-            e.isUniqueConstraintException("article_slug_key") -> unprocessable("Slug already exists")
+            e.isUniqueConstraintException("article_slug_key") -> doCreateArticle(userId, payload, true)
             else -> throw e
         }
     }
 
-    fun updateArticle(userId: String, slug: String, payload: ArticleUpdateRequest.Article): ArticleModel = try {
+    fun updateArticle(userId: String, slug: String, payload: ArticleUpdateRequest.Article): ArticleModel {
+        return doUpdateArticle(userId, slug, payload, false)
+    }
+
+    private fun doUpdateArticle(
+        userId: String,
+        slug: String,
+        payload: ArticleUpdateRequest.Article,
+        slugSuffix: Boolean,
+    ): ArticleModel = try {
         tx {
             val article = getBySlug(slug)
             if (article.author.id.value != userId) forbidden("Not author")
 
             payload.title?.let {
                 article.title = it
-                article.slug = it.slugify()
+                article.slug = it.slugify(slugSuffix)
             }
             payload.description?.let { article.description = it }
             payload.body?.let { article.body = it }
@@ -108,7 +125,7 @@ class ArticleService(private val userService: UserService) {
         }
     } catch (e: ExposedSQLException) {
         when {
-            e.isUniqueConstraintException("article_slug_key") -> unprocessable("Slug already exists")
+            e.isUniqueConstraintException("article_slug_key") -> doUpdateArticle(userId, slug, payload, true)
             else -> throw e
         }
     }
