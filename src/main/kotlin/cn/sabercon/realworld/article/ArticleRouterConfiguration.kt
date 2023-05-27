@@ -21,13 +21,14 @@ class ArticleRouterConfiguration {
             val favorited = it.paramOrNull("favorited")
             val pageParams = it.pageParams()
             val articles = service.listArticle(userId, tag, author, favorited, pageParams)
-            val count = service.countArticle(userId, tag, author, favorited)
+            val count = service.countArticle(tag, author, favorited)
             ok().body(ArticlesResponse(articles, count))
         }
 
         GET("/articles/feed") {
             val userId = it.userId()
-            val articles = service.listFeedArticle(userId)
+            val pageParams = it.pageParams()
+            val articles = service.listFeedArticle(userId, pageParams)
             val count = service.countFeedArticle(userId)
             ok().body(ArticlesResponse(articles, count))
         }

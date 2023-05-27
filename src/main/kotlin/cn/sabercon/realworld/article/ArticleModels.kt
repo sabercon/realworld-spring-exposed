@@ -31,7 +31,24 @@ data class ArticleModel(
     val favorited: Boolean,
     val favoritesCount: Long,
     val author: ProfileModel,
-)
+) {
+    companion object {
+        fun from(article: Article, author: ProfileModel, favorited: Boolean, favoritesCount: Long): ArticleModel {
+            return ArticleModel(
+                slug = article.slug,
+                title = article.title,
+                description = article.description,
+                body = article.body,
+                tagList = article.tags.map { it.name },
+                createdAt = article.createdAt,
+                updatedAt = article.updatedAt,
+                favorited = favorited,
+                favoritesCount = favoritesCount,
+                author = author,
+            )
+        }
+    }
+}
 
 data class ArticleResponse(val article: ArticleModel)
 
