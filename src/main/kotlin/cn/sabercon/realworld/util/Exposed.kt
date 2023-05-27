@@ -5,6 +5,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.javatime.CurrentTimestamp
 import org.jetbrains.exposed.sql.javatime.timestamp
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
@@ -25,13 +26,13 @@ fun ExposedSQLException.isUniqueConstraintException(key: String? = null): Boolea
 }
 
 abstract class BaseTable(name: String = "") : Table(name) {
-    val createdAt = timestamp("created_at").clientDefault { Instant.now() }
-    val updatedAt = timestamp("updated_at").nullable()
+    val createdAt = timestamp("created_at").defaultExpression(CurrentTimestamp())
+    val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp())
 }
 
 abstract class BaseIdTable<T : Comparable<T>>(name: String = "") : IdTable<T>(name) {
-    val createdAt = timestamp("created_at").clientDefault { Instant.now() }
-    val updatedAt = timestamp("updated_at").nullable()
+    val createdAt = timestamp("created_at").defaultExpression(CurrentTimestamp())
+    val updatedAt = timestamp("updated_at").defaultExpression(CurrentTimestamp())
 }
 
 abstract class BaseEntity<ID : Comparable<ID>>(id: EntityID<ID>, table: BaseIdTable<ID>) : Entity<ID>(id) {
@@ -44,7 +45,7 @@ abstract class BaseEntityClass<ID : Comparable<ID>, out T : BaseEntity<ID>>(tabl
     init {
         EntityHook.subscribe { action ->
             if (action.changeType == EntityChangeType.Updated) {
-                action.toEntity(this)!!.updatedAt = Instant.now()
+                action.toEntity(this)?.updatedAt = Instant.now()
             }
         }
     }
