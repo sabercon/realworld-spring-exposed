@@ -39,7 +39,7 @@ data class ArticleModel(
                 title = article.title,
                 description = article.description,
                 body = article.body,
-                tagList = article.tags.map { it.name },
+                tagList = article.tags.map { it.name }.sorted(),
                 createdAt = article.createdAt,
                 updatedAt = article.updatedAt,
                 favorited = favorited,
