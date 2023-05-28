@@ -48,7 +48,7 @@ When running locally, the application will start a PostgreSQL database using [do
 ### Using shell script
 
 ```shell
-$ ./api/run-api-tests.sh
+$ APIURL=http://localhost:8080/api ./api/run-api-tests.sh
 ```
 
 ### Using gradle test
