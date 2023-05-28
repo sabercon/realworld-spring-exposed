@@ -14,15 +14,15 @@ the [RealWorld](https://github.com/gothinkster/realworld) repo.
 
 # How it works
 
-- Spring Boot for Web API implementations
-- Exposed for persistence layer
-- Flyway for database migrations
-- PostgreSQL for actual database
-- JWT for authentication
-- Kotest for tests
-- Testcontainers for integration tests
-- Detekt for static code analysis
-- Kover for test coverage
+- [Spring Boot](https://spring.io/projects/spring-boot) for Web API implementations
+- [Exposed](https://github.com/JetBrains/Exposed) for the persistence layer
+- [Flyway](https://flywaydb.org/) for database migrations
+- [PostgreSQL](https://www.postgresql.org/) for the actual database
+- [JWT](https://jwt.io/) for authentication
+- [Kotest](https://kotest.io/) for tests
+- [Testcontainers](https://www.testcontainers.org/) for integration tests
+- [Detekt](https://detekt.dev/) for static code analysis
+- [Kover](https://github.com/Kotlin/kotlinx-kover) for test coverage
 
 ## Security
 
