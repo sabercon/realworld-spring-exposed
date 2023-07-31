@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: natiginfo/action-detekt-all@1.22.0
+      - uses: natiginfo/action-detekt-all@1.23.1
         with:
           # Adds `--plugins` because of this issue:
           # https://github.com/natiginfo/action-detekt-all/issues/44#issuecomment-1137125204
